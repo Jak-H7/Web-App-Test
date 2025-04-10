@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <title>Home</title>
+        </p>
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="menu">
+                <div class="menu-logo">
+                    <img src="{{ url_for('static', filename='images/thumbnail_Fiddler-Logo-F-Vert.png') }}" alt="Logo">
+                </div>
+                <a href="/home" class="value">Home</a>
+                <a href="/addParticipant" class="value">Add Participant</a>
+                <a href="/editParticipant" class="value">Edit Participant</a>
+                <a href="/addCategory" class="value">Add Category</a>
+                <a href="/enterScores" class="value">Enter Scores</a>
+                <a href="/report" class="value">Report</a>
+            </div>
+            <div class="content">
+                <img src="{{ url_for('static', filename='images/home_image.png') }}" alt="Home Image" class="home-image">
+            </div>
+        </div>
+    </body>
+</html>

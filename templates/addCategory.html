@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <title>Add Category</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="menu">
+                <div class="menu-logo">
+                    <img src="{{ url_for('static', filename='images/thumbnail_Fiddler-Logo-F-Vert.png') }}" alt="Logo">
+                </div>
+                <a href="/home" class="value">Home</a>
+                <a href="/addParticipant" class="value">Add Participant</a>
+                <a href="/editParticipant" class="value">Edit Participant</a>
+                <a href="/addCategory" class="value">Add Category</a>
+                <a href="/enterScores" class="value">Enter Scores</a>
+                <a href="/report" class="value">Report</a>
+            </div>
+
+            <div class="add-participant">
+                <h2>Add Category</h2>
+
+                <form action="/addCategory" method="POST" class="horizontal-form">
+                    <div class="form-inputs">
+                        <div class="horizontal-input-group">
+                            <input type="hidden" name="source" value="add_category">
+                            <div class="input-field">
+                                <label for="category_name">Category Name:</label>
+                                <input type="text" name="category_name" class="input" required>
+                            </div>
+                            <div class="input-field">
+                                <label for="criteria_count">Criteria Count:</label>
+                                <input type="number" name="criteria_count" class="input" required min="1">
+                            </div>
+                        </div>
+                        <div class="button-container">
+                            <button type="submit" class="custom-button upload-button">Add Category</button>
+                        </div>
+                    </div>
+                </form>
+
+                <form action="/addCategory" method="POST" class="horizontal-form">
+                    <div class="form-inputs">
+                        <div class="select-group">
+                            <input type="hidden" name="source" value="select">
+                            <label for="category">Edit Category:</label>
+                            <select id="category_name" name="category_name" class="input" required>
+                                <option value="">Select a Category</option>
+                                {% for category in categories %}
+                                    {% if category.category_name == selected_category_name %}
+                                        <option selected value="{{category.category_name}}">{{category.category_name}}</option>
+                                    {% else %}
+                                        <option value="{{category.category_name}}">{{category.category_name}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="custom-button upload-button">Submit</button>
+                        </div>
+                    </div>
+                </form>
+                
+                {% if selected_category_name %}
+
+                <form action="/addCategory/{{selected_category_name}}" method="POST" class="horizontal-form">
+                    <div class="form-inputs">
+                        <div class="select-group">
+                            <input type="hidden" name="source" value="add_participant">
+                            <label for="category">Add Participant to Category:</label>
+                            <select id="participant_id" name="participant_id" class="input" required>
+                                <option value="">Select a Participant</option>
+                                {% for participant in participants %}
+                                    <option value="{{participant.participant_id}}">{{participant.first_name}} {{participant.last_name}}, {{participant.city}} {{participant.state}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="custom-button upload-button">Submit</button>
+                        </div>
+                    </div>
+                </form>
+                
+                <form action="/addCategory/{{selected_category_name}}" method="POST" class="horizontal-form">
+                    <div class="form-inputs">
+                        <div class="select-group">
+                            <input type="hidden" name="source" value="shuffle">
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="custom-button upload-button">Shuffle Positions</button>
+                        </div>
+                    </div>
+                </form>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>City</th>
+                            <th>State</th>
+                            <th>Position</th>
+                            <th>Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for participant in category_participants %}
+                        <tr>
+                            <td>{{ participant.participant_id }}</td>
+                            <td>{{ participant.first_name }}</td>
+                            <td>{{ participant.last_name }}</td>
+                            <td>{{ participant.city }}</td>
+                            <td>{{ participant.state }}</td>
+                            <td>{{ participant.position }}</td>
+                            <td>
+                                <form action="/addCategory/{{selected_category_name}}" method="POST" class="horizontal-form">
+                                    <input type="hidden" name="source" value="remove_participant">
+                                    <input type="hidden" name="participant_id" value="{{ participant.participant_id }}">
+                                    <button type="submit" class="custom-button upload-button">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% endif %}
+            </div>
+        </div>
+    </body>
+</html>

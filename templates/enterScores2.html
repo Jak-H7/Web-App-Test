@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <title>Enter Scores</title>
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="menu">
+                <div class="menu-logo">
+                    <img src="{{ url_for('static', filename='images/thumbnail_Fiddler-Logo-F-Vert.png') }}" alt="Logo">
+                </div>
+                <a href="/home" class="value">Home</a>
+                <a href="/addParticipant" class="value">Add Participant</a>
+                <a href="/editParticipant" class="value">Edit Participant</a>
+                <a href="/addCategory" class="value">Add Category</a>
+                <a href="/enterScores" class="value">Enter Scores</a>
+                <a href="/report" class="value">Report</a>
+            </div>
+
+            <a href="/enterScores">Back</a>
+            <form action="/enterScores/{{selected_category_name}}/{{judge_count}}/{{position}}" method="POST" class="horizontal-form">
+                <div class="form-inputs">
+                    <input type="hidden" name="source" value="score_submit">
+                    
+                    <div class="select-group">
+                        <label for="participant">Participant:</label>
+                        <select id="participant_id" name="participant_id" class="input" required>
+                            <option value="">
+                                {% if tie %}
+                                   Break Tie
+                                {% else %}
+                                    Select a Participant
+                                {% endif %}
+                            </option>
+                            {% for participant in category_participants %}
+                                <option value="{{participant.participant_id,participant.position}}"
+                                    {% if position == participant.position %}
+                                        selected
+                                    {% endif %}
+                                > {{participant.position}} {{participant.first_name}} {{participant.last_name}}, {{participant.city}} {{participant.state}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="judge-scores">
+                        {% for i in range(judge_count) %}
+                        <div class="judge-group">
+                            <label for="judge {{ i }}">Judge {{i + 1}}:</label>
+                            <div class="score-inputs">
+                                {% for j in range(criteria_count) %}
+                                    <input type="number" name="judge_{{i}}_{{j}}" class="input score-input" placeholder="Score" min="0" max="100" step="0.01" value="0" required>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="custom-button upload-button">Submit Scores</button>
+                    </div>
+                </div>
+            </form>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Score</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for score in scores %}
+                    <tr>
+                        <td>{{ score.score }}</td>
+                        <td>{{ score.first_name }}</td>
+                        <td>{{ score.last_name }}</td>
+                        <td>
+                            <form action="/enterScores/{{selected_category_name}}/{{judge_count}}" method="POST" class="horizontal-form">
+                                <input type="hidden" name="source" value="delete">
+                                <input type="hidden" name="participant_id" value="{{ score.participant_id }}">
+                                <button type="submit" class="custom-button upload-button">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </body>
+</html>

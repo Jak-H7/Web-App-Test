@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Edit Participant</title>
+</head>
+<body>
+    <div class="container">
+        <div class="menu">
+            <div class="menu-logo">
+                <img src="{{ url_for('static', filename='images/thumbnail_Fiddler-Logo-F-Vert.png') }}" alt="Logo">
+            </div>
+            <a href="/home" class="value">Home</a>
+            <a href="/addParticipant" class="value">Add Participant</a>
+            <a href="/editParticipant" class="value">Edit Participant</a>
+            <a href="/addCategory" class="value">Add Category</a>
+            <a href="/enterScores" class="value">Enter Scores</a>
+            <a href="/report" class="value">Report</a>
+        </div>
+
+        <div class="add-participant">
+            <h2>Edit Participant</h2>
+            
+            <!-- Participant Selection Form -->
+            <form action="#" method="GET" class="horizontal-form" id="selectParticipantForm">
+                <div class="form-inputs">
+                    <div class="select-group">
+                        <label for="participant_select">Select Participant:</label>
+                        <select id="participant_select" class="input" onchange="redirectToParticipant(this.value)">
+                            <option value="">Choose a Participant</option>
+                            {% for p in participants %}
+                                <option value="{{ p.participant_id }}" 
+                                        {% if participant and participant.participant_id == p.participant_id %}selected{% endif %}>
+                                    {{ p.first_name }} {{ p.last_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+            {% if error %}
+            <div class="notification is-danger">
+                {{ error }}
+            </div>
+            {% endif %}
+            {% if success %}
+            <div class="notification is-success">
+                {{ success }}
+            </div>
+            {% endif %}
+
+            {% if participant %}
+            <div class="edit-form-container">
+                <!-- Edit Form -->
+                <form action="/edit/{{ participant.participant_id }}" method="POST" class="vertical-form">
+                    <div class="form-inputs">
+                        <div class="vertical-input-group" style="text-align: left;">
+                            <div class="input-field">
+                                <label for="first_name">First Name:</label>
+                                <input type="text" name="first_name" value="{{ participant.first_name }}" class="input" required>
+                            </div>
+                            <div class="input-field">
+                                <label for="last_name">Last Name:</label>
+                                <input type="text" name="last_name" value="{{ participant.last_name }}" class="input" required>
+                            </div>
+                            <div class="input-field">
+                                <label for="age">Age:</label>
+                                <input type="number" name="age" value="{{ participant.age }}" class="input" required min="1" max="120">
+                            </div>
+                            <div class="input-field">
+                                <label for="city">City:</label>
+                                <input type="text" name="city" value="{{ participant.city }}" class="input" required>
+                            </div>
+                            <div class="input-field">
+                                <label for="state">State:</label>
+                                <input type="text" name="state" value="{{ participant.state }}" class="input" required>
+                            </div>
+                        </div>
+                        <div class="button-container">
+                            <button type="submit" class="custom-button upload-button">Update</button>
+                            <button type="button" class="custom-button" onclick="confirmAndDelete({{ participant.participant_id }})">Delete</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function redirectToParticipant(participantId) {
+            if (participantId) {
+                window.location.href = '/editParticipant/' + participantId;
+            }
+        }
+
+        function confirmAndDelete(participantId) {
+            if (confirm('Are you sure you want to delete this participant? This action cannot be undone.')) {
+                fetch('/delete/' + participantId, {
+                    method: 'POST',
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/editParticipant?success=Participant+deleted+successfully';
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

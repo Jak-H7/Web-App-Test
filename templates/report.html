@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <style>
+            /* Print styles */
+            @media print {
+                body * {
+                    visibility: hidden;
+                }
+                .scores-table-container, .scores-table-container * {
+                    visibility: visible;
+                }
+                .scores-table-container {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                }
+                .no-print {
+                    display: none;
+                }
+                .scores-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                .scores-table th, .scores-table td {
+                    border: 1px solid black;
+                    padding: 8px;
+                    text-align: center;
+                }
+                .scores-table th {
+                    background-color: #f2f2f2 !important;
+                    -webkit-print-color-adjust: exact;
+                }
+                .print-header {
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+                .print-header h1 {
+                    font-size: 24px;
+                    margin-bottom: 5px;
+                }
+                .print-header p {
+                    font-size: 16px;
+                    margin-bottom: 5px;
+                }
+            }
+            
+            /* Regular table styles */
+            .scores-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            .scores-table th, .scores-table td {
+                border: 1px solid #ddd;
+                padding: 12px 8px;
+                text-align: center;
+            }
+            .scores-table th {
+                background-color: #f5f5f5;
+                font-weight: bold;
+            }
+            .scores-table tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+            .scores-table tr:hover {
+                background-color: #f5f5f5;
+            }
+            
+            .print-button {
+                background-color: #4CAF50;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                margin: 10px 0;
+            }
+            
+            .print-button:hover {
+                background-color: #45a049;
+            }
+
+            /* Tab styles */
+            .tab {
+                display: none;
+            }
+            .tab.active {
+                display: block;
+            }
+            .tab-buttons {
+                margin-bottom: 20px;
+            }
+            .tab-button {
+                margin-right: 10px;
+            }
+            .tab-button.active {
+                background-color: #4CAF50;
+                color: white;
+            }
+        </style>
+        <title>Report</title>
+        <script>
+            function printReport() {
+                window.print();
+            }
+        </script>
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="menu">
+                <div class="menu-logo">
+                    <img src="{{ url_for('static', filename='images/thumbnail_Fiddler-Logo-F-Vert.png') }}" alt="Logo">
+                </div>
+                <a href="/home" class="value">Home</a>
+                <a href="/addParticipant" class="value">Add Participant</a>
+                <a href="/editParticipant" class="value">Edit Participant</a>
+                <a href="/addCategory" class="value">Add Category</a>
+                <a href="/enterScores" class="value">Enter Scores</a>
+                <a href="/report" class="value">Report</a>
+            </div>
+
+            <div class="content">
+
+                <form action="/report" method="GET" class="horizontal-form">
+                    <div class="form-inputs">
+                        <div class="select-group">
+                            <label for="category_name">Select Category:</label>
+                            <select id="category_name" name="category_name" class="input">
+                                <option value="">Select a Category</option>
+                                {% for category in categories %}
+                                    {% if selected_category and category.category_name == selected_category.category_name %}
+                                        <option selected value="{{ category.category_name }}">{{ category.category_name }}</option>
+                                    {% else %}
+                                        <option value="{{ category.category_name }}">{{ category.category_name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="custom-button">View Rankings</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="tab-content">
+                    {% if selected_category %}
+                    <div class="rankings-list">
+                        <h3>Rankings for {{ selected_category.category_name }}</h3>
+                        <button onclick="window.print()" class="print-button no-print">Print Rankings</button>
+                        <div class="scores-table-container">
+                            <div class="print-header">
+                                <p>Category: {{ selected_category.category_name }}</p>
+                            </div>
+                            {% if competition_results[selected_category.category_name] %}
+                            <table class="scores-table">
+                                <thead>
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Total Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for result in competition_results[selected_category.category_name] %}
+                                    <tr>
+                                        <td>{{ result.position }}</td>
+                                        <td>{{ result.first_name }} {{ result.last_name }}</td>
+                                        <td>{{ "%.1f"|format(result.total_score) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p class="no-data">No scores available for this category.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
